@@ -31,7 +31,7 @@ struct EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
 struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
     Reset : EFI_TEXT_RESET,
-    OutputString : EFI_TEXT_STRING,
+    OutputString : unsafe extern "win64" fn(*const EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL, *const u16), //-> Status, //EFI_TEXT_STRING,
     // ... and more stuff that we're ignoring.
 }
 
@@ -74,22 +74,38 @@ pub trait SimpleTextOutput {
     unsafe fn write_raw(&self, str: *const u16);
     
     fn write(&self, str: &str) {
-        let mut buf = [0u16; 4096];
+        // let mut buf = [0u16; 4096];
 
-        let mut i = 0;
-        for c in str.chars() {
-            if i >= buf.len() {
-                break;
-            }
-            buf[i] = c as u16;
-            i += 1;
-        }
+        let mut buf = ['H' as u16,
+                     'e' as u16,
+                     'l' as u16,
+                     'l' as u16,
+                     'o' as u16,
+                     ',' as u16,
+                     ' ' as u16,
+                     'W' as u16,
+                     'o' as u16,
+                     'r' as u16,
+                     'l' as u16,
+                     'd' as u16,
+                     '\r' as u16,
+                     '\n' as u16,
+                     0u16];
 
-        buf[buf.len() - 1] = 0;
+        // let mut i = 0;
+        // for c in str.chars() {
+        //     if i >= buf.len() {
+        //         break;
+        //     }
+        //     buf[i] = c as u16;
+        //     i += 1;
+        // }
+
+        // buf[buf.len() - 1] = 0;
         
         unsafe {
             let (p, _) = unpack(&buf);
-            self.write_raw(p);
+            // self.write_raw(p);
         }
     }
 }
@@ -115,11 +131,50 @@ extern "rust-intrinsic" {
     fn transmute<T,U>(val: T) -> U;
 }
 
+// We also need some helpers to find a pointer to the hello world string.
+fn buf_ptr<T>(buf: &[T]) -> (*const T, usize) {
+    unsafe { transmute(buf) }
+}
+
 #[no_mangle]
 pub extern "win64" fn efi_start(_ImageHandle : EFI_HANDLE,
                                 sys_table : *const EFI_SYSTEM_TABLE) -> isize {
-    unsafe { SYSTEM_TABLE = sys_table; }
-    ::efi_main(SystemTable(sys_table));
+    // unsafe { SYSTEM_TABLE = sys_table; }
+    // ::efi_main(SystemTable(sys_table));
+    // 0
+
+    unsafe {
+        let sys_table = &*sys_table;
+        let vendor = sys_table.FirmwareVendor;
+        let conout = sys_table.ConOut;
+        let output = (*conout).OutputString;
+
+        let hello = ['H' as u16,
+                     'e' as u16,
+                     'l' as u16,
+                     'l' as u16,
+                     'o' as u16,
+                     ',' as u16,
+                     ' ' as u16,
+                     'W' as u16,
+                     'o' as u16,
+                     'r' as u16,
+                     'l' as u16,
+                     'd' as u16,
+                     '\r' as u16,
+                     '\n' as u16,
+                     0u16];
+        let (hello_ptr, _) = buf_ptr(&hello);
+
+        // let m = 1/0;
+        if output {
+
+        }
+        output(conout, hello_ptr);
+
+        // loop {
+        // }
+    }
     0
 }
 

@@ -24,7 +24,7 @@ extern fn panic_fmt(_: ::core::fmt::Arguments, _: &'static str, _: u32) -> ! {
 pub fn efi_main(sys : uefi::SystemTable) {
     sys.console().write("Hello, World!\n\r");
 
-    loop {}
+    // loop {}
 }
 
 #[no_mangle]
