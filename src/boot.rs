@@ -1,9 +1,8 @@
 #![no_std]
-#![feature(globs)]
 #![feature(intrinsics)]
 #![feature(asm)]
-
-extern crate core;
+#![feature(lang_items)]
+#![feature(link_args)]
 
 use uefi::SimpleTextOutput;
 
@@ -13,7 +12,15 @@ use uefi::SimpleTextOutput;
 #[allow(missing_copy_implementations)]
 pub mod uefi;
 
-#[no_stack_check]
+#[link_args = "/SUBSYSTEM:EFI_APPLICATION"]
+extern "C" {}
+
+#[lang="panic_fmt"]
+extern fn panic_fmt(_: ::core::fmt::Arguments, _: &'static str, _: u32) -> ! {
+    loop {}
+}
+
+
 pub fn efi_main(sys : uefi::SystemTable) {
     sys.console().write("Hello, World!\n\r");
 
@@ -29,3 +36,13 @@ pub fn abort() -> ! {
 pub fn breakpoint() -> ! {
 	loop {}
 }
+
+#[no_mangle]
+pub fn __chkstk() -> ! {
+	loop {}
+}
+
+// #[no_mangle]
+// pub extern "win64" fn __CxxFrameHandler3() -> ! {
+// 	loop {}
+// }
