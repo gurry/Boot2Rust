@@ -1,6 +1,9 @@
+use core::ptr;
+
 pub type EFI_HANDLE = *const ();
 pub struct EFI_GUID(u32, u16, u16, [u8; 8]);
 
+#[repr(C)]
 struct EFI_TABLE_HEADER {
     Signature  : u64,
     Revision   : u32,
@@ -9,6 +12,7 @@ struct EFI_TABLE_HEADER {
     Reserved : u32
 }
 
+#[repr(C)]
 pub struct EFI_SYSTEM_TABLE {
     Hdr : EFI_TABLE_HEADER,
     FirmwareVendor : *const u16,
@@ -144,9 +148,7 @@ pub extern "win64" fn efi_start(_ImageHandle : EFI_HANDLE,
     // 0
 
     unsafe {
-        let sys_table = &*sys_table;
-        let vendor = sys_table.FirmwareVendor;
-        let conout = sys_table.ConOut;
+        let conout = (*sys_table).ConOut;
         let output = (*conout).OutputString;
 
         let hello = ['H' as u16,
@@ -166,10 +168,6 @@ pub extern "win64" fn efi_start(_ImageHandle : EFI_HANDLE,
                      0u16];
         let (hello_ptr, _) = buf_ptr(&hello);
 
-        // let m = 1/0;
-        if output {
-
-        }
         output(conout, hello_ptr);
 
         // loop {
