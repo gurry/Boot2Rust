@@ -78,9 +78,7 @@ pub trait SimpleTextOutput {
     unsafe fn write_raw(&self, str: *const u16);
     
     fn write(&self, str: &str) {
-        // let mut buf = [0u16; 4096];
-
-        let mut buf = ['H' as u16,
+        let mut buf2 = ['X' as u16,
                      'e' as u16,
                      'l' as u16,
                      'l' as u16,
@@ -96,20 +94,49 @@ pub trait SimpleTextOutput {
                      '\n' as u16,
                      0u16];
 
+
+        // let mut buf = [0u16; 2024];
+        // buf[0] = 'X' as u16;
+        // buf[1] = 'e' as u16;
+        // buf[2] = 'l' as u16;
+        // buf[3] = 'l' as u16;
+        // buf[4] = 'o' as u16;
+        // buf[5] = ',' as u16;
+        // buf[6] = ' ' as u16;
+        // buf[7] = 'W' as u16;
+        // buf[8] = 'o' as u16;
+        // buf[9] = 'r' as u16;
+        // buf[10] = 'l' as u16;
+        // buf[11] = 'd' as u16;
+        // buf[12] = '\r' as u16;
+        // buf[13] = '\n' as u16;
+        // buf[14] = 0u16;
+
         // let mut i = 0;
-        // for c in str.chars() {
-        //     if i >= buf.len() {
-        //         break;
+        // let mut char_iter = str.chars();
+        // while i < buf.len() - 3 {
+        //     let c = char_iter.next();
+        //     match c {
+        //         Some(c) => {
+        //             // TODO: make sure the characters are all ascii
+        //             buf[i] = c as u16;
+        //         },
+        //         None =>  {
+        //             buf[i] = '\r' as u16;
+        //             buf[i + 1] = '\n' as u16;
+        //             buf[i + 2] = 0u16;
+        //             break
+        //         }
+
         //     }
-        //     buf[i] = c as u16;
         //     i += 1;
         // }
 
         // buf[buf.len() - 1] = 0;
-        
-        unsafe {
-            let (p, _) = unpack(&buf);
-            // self.write_raw(p);
+
+        unsafe { 
+            let (p, _) = unpack(&buf2);
+            self.write_raw(p);
         }
     }
 }
@@ -148,8 +175,13 @@ pub extern "win64" fn efi_start(_ImageHandle : EFI_HANDLE,
     // 0
 
     unsafe {
-        let conout = (*sys_table).ConOut;
+        let st = SystemTable(sys_table);
+        let console = st.console();
+        let conout = console.output;
+
+        // let conout = (*sys_table).ConOut;
         let output = (*conout).OutputString;
+
 
         let hello = ['H' as u16,
                      'e' as u16,
@@ -166,9 +198,10 @@ pub extern "win64" fn efi_start(_ImageHandle : EFI_HANDLE,
                      '\r' as u16,
                      '\n' as u16,
                      0u16];
-        let (hello_ptr, _) = buf_ptr(&hello);
+        let (hello_ptr, _) = unpack(&hello);
 
-        output(conout, hello_ptr);
+        //output(conout, hello_ptr);
+        console.write("Fuck everyone");
 
         // loop {
         // }
