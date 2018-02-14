@@ -1,5 +1,3 @@
-use core::ptr;
-
 pub type EFI_HANDLE = *const ();
 pub struct EFI_GUID(u32, u16, u16, [u8; 8]);
 
@@ -95,7 +93,7 @@ pub trait SimpleTextOutput {
                      0u16];
 
 
-        // let mut buf = [0u16; 2024];
+        let mut buf = [0u16; 2024];
         // buf[0] = 'X' as u16;
         // buf[1] = 'e' as u16;
         // buf[2] = 'l' as u16;
@@ -112,27 +110,27 @@ pub trait SimpleTextOutput {
         // buf[13] = '\n' as u16;
         // buf[14] = 0u16;
 
-        // let mut i = 0;
-        // let mut char_iter = str.chars();
-        // while i < buf.len() - 3 {
-        //     let c = char_iter.next();
-        //     match c {
-        //         Some(c) => {
-        //             // TODO: make sure the characters are all ascii
-        //             buf[i] = c as u16;
-        //         },
-        //         None =>  {
-        //             buf[i] = '\r' as u16;
-        //             buf[i + 1] = '\n' as u16;
-        //             buf[i + 2] = 0u16;
-        //             break
-        //         }
+        let mut i = 0;
+        let mut char_iter = str.chars();
+        while i < buf.len() - 3 {
+            let c = char_iter.next();
+            match c {
+                Some(c) => {
+                    // TODO: make sure the characters are all ascii
+                    buf[i] = c as u16;
+                },
+                None =>  {
+                    buf[i] = '\r' as u16;
+                    buf[i + 1] = '\n' as u16;
+                    buf[i + 2] = 0u16;
+                    break
+                }
 
-        //     }
-        //     i += 1;
-        // }
+            }
+            i += 1;
+        }
 
-        // buf[buf.len() - 1] = 0;
+        buf[buf.len() - 1] = 0;
 
         unsafe { 
             let (p, _) = unpack(&buf2);

@@ -1,7 +1,0 @@
-[build]
-target = "x86_64-pc-windows-msvc"         # build for the target triple
-rustflags = ["-C panic=abort", "--crate-type=lib"]  # custom flags to pass to all compiler invocations
-
-
-[target.x86_64-pc-windows-msvc]
-linker = "'c:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\BIN\\link' /subsystem:EFI_APPLICATION"
