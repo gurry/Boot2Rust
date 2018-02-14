@@ -16,7 +16,7 @@ pub mod uefi;
 extern "C" {}
 
 extern crate rlibc;
-
+extern crate compiler_builtins;
 
 #[no_mangle]
 #[lang="panic_fmt"]

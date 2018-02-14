@@ -212,18 +212,18 @@ pub fn __morestack() {
     // Horrible things will probably happen if this is ever called.
 }
 
-#[no_mangle]
-pub extern fn memset(s : *const u8, c : isize, n : usize) -> *const u8 {
-    unsafe {
-        let s : &mut [u8] = transmute((s, n));
-        let mut i = 0;
-        while i < n {
-            s[i] = c as u8;
-            i += 1;
-            // Use inline assembly here to defeat LLVM's loop-idiom pass
-            asm!("");
-        }
-    }
+// #[no_mangle]
+// pub extern fn memset(s : *const u8, c : isize, n : usize) -> *const u8 {
+//     unsafe {
+//         let s : &mut [u8] = transmute((s, n));
+//         let mut i = 0;
+//         while i < n {
+//             s[i] = c as u8;
+//             i += 1;
+//             // Use inline assembly here to defeat LLVM's loop-idiom pass
+//             asm!("");
+//         }
+//     }
 
-    s
-}
+//     s
+// }
