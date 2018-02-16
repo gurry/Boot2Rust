@@ -13,6 +13,7 @@ use uefi::SimpleTextOutput;
 #[allow(missing_copy_implementations)]
 pub mod uefi;
 
+#[allow(unused_attributes)] // The below attribute is needed to specify the entry point. Hence suppressing the warning
 #[link_args = "/ENTRY:efi_start"]
 extern "C" {}
 
@@ -21,7 +22,7 @@ extern crate compiler_builtins;
 
 #[no_mangle]
 #[lang="panic_fmt"]
-extern fn panic_fmt(_: ::core::fmt::Arguments, _: &'static str, _: u32) -> ! {
+pub extern fn panic_fmt(_: ::core::fmt::Arguments, _: &'static str, _: u32) -> ! {
     loop {}
 }
 
