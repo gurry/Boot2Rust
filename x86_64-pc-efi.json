@@ -22,7 +22,6 @@
   "pre-link-args": {                                         
     "msvc": [                                                
       "/NOLOGO",                                             
-      "/NXCOMPAT",
       "/SUBSYSTEM:EFI_APPLICATION"
     ]                                                        
   },                                                         

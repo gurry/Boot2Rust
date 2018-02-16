@@ -3,6 +3,7 @@
 #![feature(asm)]
 #![feature(lang_items)]
 #![feature(link_args)]
+#![feature(compiler_builtins_lib)]
 
 use uefi::SimpleTextOutput;
 
@@ -29,7 +30,7 @@ extern fn panic_fmt(_: ::core::fmt::Arguments, _: &'static str, _: u32) -> ! {
 pub fn efi_main(sys : uefi::SystemTable) {
     sys.console().write("Hello, World!\n\r");
 
-    // loop {}
+    loop {}
 }
 
 #[no_mangle]

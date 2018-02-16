@@ -76,40 +76,7 @@ pub trait SimpleTextOutput {
     unsafe fn write_raw(&self, str: *const u16);
     
     fn write(&self, str: &str) {
-        let mut buf2 = ['X' as u16,
-                     'e' as u16,
-                     'l' as u16,
-                     'l' as u16,
-                     'o' as u16,
-                     ',' as u16,
-                     ' ' as u16,
-                     'W' as u16,
-                     'o' as u16,
-                     'r' as u16,
-                     'l' as u16,
-                     'd' as u16,
-                     '\r' as u16,
-                     '\n' as u16,
-                     0u16];
-
-
-        let mut buf = [0u16; 2024];
-        // buf[0] = 'X' as u16;
-        // buf[1] = 'e' as u16;
-        // buf[2] = 'l' as u16;
-        // buf[3] = 'l' as u16;
-        // buf[4] = 'o' as u16;
-        // buf[5] = ',' as u16;
-        // buf[6] = ' ' as u16;
-        // buf[7] = 'W' as u16;
-        // buf[8] = 'o' as u16;
-        // buf[9] = 'r' as u16;
-        // buf[10] = 'l' as u16;
-        // buf[11] = 'd' as u16;
-        // buf[12] = '\r' as u16;
-        // buf[13] = '\n' as u16;
-        // buf[14] = 0u16;
-
+        let mut buf = [0u16; 1024];
         let mut i = 0;
         let mut char_iter = str.chars();
         while i < buf.len() - 3 {
@@ -133,7 +100,7 @@ pub trait SimpleTextOutput {
         buf[buf.len() - 1] = 0;
 
         unsafe { 
-            let (p, _) = unpack(&buf2);
+            let (p, _) = unpack(&buf);
             self.write_raw(p);
         }
     }
@@ -160,50 +127,11 @@ extern "rust-intrinsic" {
     fn transmute<T,U>(val: T) -> U;
 }
 
-// We also need some helpers to find a pointer to the hello world string.
-fn buf_ptr<T>(buf: &[T]) -> (*const T, usize) {
-    unsafe { transmute(buf) }
-}
-
 #[no_mangle]
 pub extern "win64" fn efi_start(_ImageHandle : EFI_HANDLE,
                                 sys_table : *const EFI_SYSTEM_TABLE) -> isize {
-    // unsafe { SYSTEM_TABLE = sys_table; }
-    // ::efi_main(SystemTable(sys_table));
-    // 0
-
-    unsafe {
-        let st = SystemTable(sys_table);
-        let console = st.console();
-        let conout = console.output;
-
-        // let conout = (*sys_table).ConOut;
-        let output = (*conout).OutputString;
-
-
-        let hello = ['H' as u16,
-                     'e' as u16,
-                     'l' as u16,
-                     'l' as u16,
-                     'o' as u16,
-                     ',' as u16,
-                     ' ' as u16,
-                     'W' as u16,
-                     'o' as u16,
-                     'r' as u16,
-                     'l' as u16,
-                     'd' as u16,
-                     '\r' as u16,
-                     '\n' as u16,
-                     0u16];
-        let (hello_ptr, _) = unpack(&hello);
-
-        //output(conout, hello_ptr);
-        console.write("Fuck everyone");
-
-        // loop {
-        // }
-    }
+    unsafe { SYSTEM_TABLE = sys_table; }
+    ::efi_main(SystemTable(sys_table));
     0
 }
 
@@ -211,19 +139,3 @@ pub extern "win64" fn efi_start(_ImageHandle : EFI_HANDLE,
 pub fn __morestack() {
     // Horrible things will probably happen if this is ever called.
 }
-
-// #[no_mangle]
-// pub extern fn memset(s : *const u8, c : isize, n : usize) -> *const u8 {
-//     unsafe {
-//         let s : &mut [u8] = transmute((s, n));
-//         let mut i = 0;
-//         while i < n {
-//             s[i] = c as u8;
-//             i += 1;
-//             // Use inline assembly here to defeat LLVM's loop-idiom pass
-//             asm!("");
-//         }
-//     }
-
-//     s
-// }
